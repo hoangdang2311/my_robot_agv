@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="use_gazebo" default="true"/>
+    <arg name="rvizconfig" default="$(find my_robot_agv)/rviz/my_robot_gmapping.rviz"/>  
+    <arg name="world_name" default="room1"/>
+    <arg name="use_amcl" default="true"/>
+    <arg name="map_file" default="$(find my_robot_agv)/navigation/maps/$(arg world_name).yaml" if="$(arg use_amcl)"/>
+    
+    <include file="$(find my_robot_agv)/launch/robot_gazebo.launch" if="$(arg use_gazebo)">
+    </include>
+
+    <include file="$(find my_robot_agv)/launch/urdf.launch">
+    </include>
+
+        <group if="$(arg use_amcl)">
+            <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"/>
+            
+            <include file="$(find my_robot_agv)/navigation/navigation_launch/amcl.launch">
+            </include>
+        </group>
+
+        
+        <include file="$(find my_robot_agv)/navigation/navigation_launch/move_base.launch"/>
+</launch>
+
